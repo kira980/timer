@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tray Timer</title>
+  <meta name="description" content="Multiple independent countdown timers, one per tray.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tray Timer">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>Tray Timer</h1>
+    <div class="header-actions">
+      <button id="install" class="ghost" hidden>Install</button>
+      <button id="add" class="ghost" aria-label="Add tray">+ Tray</button>
+    </div>
+  </header>
+
+  <main id="trays" aria-live="polite"></main>
+
+  <p class="hint">Tap a time to change it · tap a name to rename</p>
+
+  <template id="tray-template">
+    <section class="tray">
+      <div class="tray-top">
+        <input class="name" aria-label="Tray name" maxlength="24">
+        <button class="remove" aria-label="Remove tray" title="Remove tray">×</button>
+      </div>
+      <button class="time" aria-label="Set duration"></button>
+      <div class="bar"><span></span></div>
+      <div class="controls">
+        <button class="start primary">Start</button>
+        <button class="reset">Reset</button>
+      </div>
+    </section>
+  </template>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+test/
+test-results/
+playwright-report/
+playwright.config.js
