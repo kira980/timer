@@ -1,6 +1,6 @@
 // Offline-first service worker: precache the app shell, serve cache-first,
 // refresh the cache in the background. Bump VERSION to force an update.
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE = `tray-timer-${VERSION}`;
 const ASSETS = [
   "/",

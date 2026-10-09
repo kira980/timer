@@ -94,3 +94,78 @@ test("restore accepts saved state and rejects garbage", () => {
     assert.equal(T.restore(bad), null, String(bad));
   }
 });
+
+// ---------- Orders mode ----------
+
+test("trays have bake and pickup timers from settings", () => {
+  const s = { timerMs: 60_000, bakeMs: 12 * MIN, pickupMs: 40 * MIN };
+  const [t] = T.createTrays(1, s);
+  assert.equal(t.durationMs, 60_000);
+  assert.equal(T.remaining(t.bake), 12 * MIN);
+  assert.equal(T.remaining(t.pickup), 40 * MIN);
+});
+
+test("toggleOrder starts and pauses bake + pickup together", () => {
+  let t = T.toggleOrder(T.createTray(0), 0);
+  assert.ok(T.isRunning(t.bake) && T.isRunning(t.pickup));
+  assert.ok(!T.isRunning(t)); // Timer-mode timer untouched
+  t = T.toggleOrder(t, 60_000);
+  assert.ok(!T.orderRunning(t));
+  assert.equal(T.remaining(t.bake), 19 * MIN);
+  assert.equal(T.remaining(t.pickup), 29 * MIN);
+  t = T.resetOrder(t);
+  assert.equal(T.remaining(t.bake), 20 * MIN);
+});
+
+test("setEndAt makes a timer count down to a fixed moment", () => {
+  const t = T.setEndAt(T.createTimer(5 * MIN), 100_000 + 45 * MIN, 100_000);
+  assert.ok(T.isRunning(t));
+  assert.equal(T.remaining(t, 100_000), 45 * MIN);
+  assert.equal(T.progress(t, 100_000), 1); // clamped when longer than duration
+});
+
+test("parseClock picks the next occurrence", () => {
+  const now = new Date(2026, 9, 9, 14, 0).getTime();
+  assert.equal(T.parseClock("14:30", now), new Date(2026, 9, 9, 14, 30).getTime());
+  assert.equal(T.parseClock("09:15", now), new Date(2026, 9, 10, 9, 15).getTime());
+  for (const bad of ["", "25:00", "12:60", "noon", "1430"]) assert.equal(T.parseClock(bad, now), null, bad);
+});
+
+test("tickTray reports bake and pickup finishing separately", () => {
+  let t = T.createTray(0, { timerMs: MIN, bakeMs: 2000, pickupMs: 5000 });
+  t = T.toggleOrder(t, 0);
+  let fin;
+  [t, fin] = T.tickTray(t, 2000);
+  assert.deepEqual(fin, ["bake"]);
+  assert.ok(t.bake.done && T.isRunning(t.pickup));
+  [t, fin] = T.tickTray(t, 3000);
+  assert.deepEqual(fin, []);
+  [t, fin] = T.tickTray(t, 5000);
+  assert.deepEqual(fin, ["pickup"]);
+  assert.ok(T.orderDone(t) && !T.orderRunning(t));
+});
+
+test("applyUniform sets every tray to the same times and stops them", () => {
+  const trays = [T.toggleOrder(T.createTray(0), 0), T.start(T.createTray(1), 0)];
+  const s = { timerMs: 2 * MIN, bakeMs: 15 * MIN, pickupMs: 25 * MIN };
+  for (const t of T.applyUniform(trays, s)) {
+    assert.ok(!T.isRunning(t) && !T.orderRunning(t));
+    assert.equal(T.remaining(t), 2 * MIN);
+    assert.equal(T.remaining(t.bake), 15 * MIN);
+    assert.equal(T.remaining(t.pickup), 25 * MIN);
+  }
+});
+
+test("restore upgrades trays saved before Orders mode", () => {
+  const old = [{ id: "a", name: "Tray 1", durationMs: MIN, remainingMs: MIN, endAt: null, done: false }];
+  const [t] = T.restore(JSON.stringify(old));
+  assert.equal(T.remaining(t.bake), 20 * MIN);
+  assert.equal(T.remaining(t.pickup), 30 * MIN);
+});
+
+test("restoreSettings falls back to defaults", () => {
+  assert.deepEqual(T.restoreSettings(null), T.DEFAULT_SETTINGS);
+  assert.deepEqual(T.restoreSettings("{bad"), T.DEFAULT_SETTINGS);
+  assert.equal(T.restoreSettings('{"bakeMs":600000,"pickupMs":-1}').bakeMs, 600_000);
+  assert.equal(T.restoreSettings('{"bakeMs":600000,"pickupMs":-1}').pickupMs, 30 * MIN);
+});

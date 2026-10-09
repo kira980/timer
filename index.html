@@ -20,13 +20,19 @@
     <h1>Tray Timer</h1>
     <div class="header-actions">
       <button id="install" class="ghost" hidden>Install</button>
+      <button id="settings-btn" class="ghost icon" aria-label="Settings" title="Settings">⚙︎</button>
       <button id="add" class="ghost" aria-label="Add tray">+ Tray</button>
     </div>
   </header>
 
+  <div class="mode-switch" role="group" aria-label="Mode">
+    <button id="mode-timer" data-mode="timer" aria-pressed="true">Timer</button>
+    <button id="mode-orders" data-mode="orders" aria-pressed="false">Orders</button>
+  </div>
+
   <main id="trays" aria-live="polite"></main>
 
-  <p class="hint">Tap a time to change it · tap a name to rename</p>
+  <p class="hint" id="hint"></p>
 
   <template id="tray-template">
     <section class="tray">
@@ -42,6 +48,70 @@
       </div>
     </section>
   </template>
+
+  <template id="order-template">
+    <section class="tray order">
+      <div class="tray-top">
+        <input class="name" aria-label="Tray name" maxlength="24">
+        <button class="remove" aria-label="Remove tray" title="Remove tray">×</button>
+      </div>
+      <button class="part" data-part="bake" aria-label="Edit bake time">
+        <span class="label">Bake</span>
+        <span class="count"></span>
+        <span class="at"></span>
+        <span class="bar"><span></span></span>
+      </button>
+      <button class="part" data-part="pickup" aria-label="Edit pickup time">
+        <span class="label">Pickup</span>
+        <span class="count"></span>
+        <span class="at"></span>
+        <span class="bar"><span></span></span>
+      </button>
+      <div class="controls">
+        <button class="start primary">Start</button>
+        <button class="reset">Reset</button>
+      </div>
+    </section>
+  </template>
+
+  <dialog id="edit-dialog">
+    <form method="dialog">
+      <h2 id="edit-title">Edit</h2>
+      <div class="seg" role="radiogroup">
+        <label><input type="radio" name="kind" value="duration" checked> Duration</label>
+        <label><input type="radio" name="kind" value="clock"> At time</label>
+      </div>
+      <label class="field" data-kind="duration">
+        <span>Minutes, or m:ss / h:mm:ss</span>
+        <input name="duration" inputmode="numeric" autocomplete="off">
+      </label>
+      <label class="field" data-kind="clock" hidden>
+        <span>Finish at (starts counting now)</span>
+        <input name="clock" type="time">
+      </label>
+      <p class="error" id="edit-error" hidden>Enter a valid time.</p>
+      <div class="dialog-actions">
+        <button value="cancel" formnovalidate>Cancel</button>
+        <button value="save" class="primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="settings-dialog">
+    <form method="dialog">
+      <h2>Settings</h2>
+      <p class="muted">Default times for new trays and for “Apply to all”.</p>
+      <label class="field"><span>Timer</span><input name="timerMs" inputmode="numeric" autocomplete="off"></label>
+      <label class="field"><span>Bake</span><input name="bakeMs" inputmode="numeric" autocomplete="off"></label>
+      <label class="field"><span>Pickup</span><input name="pickupMs" inputmode="numeric" autocomplete="off"></label>
+      <p class="error" id="settings-error" hidden>Use minutes, or m:ss / h:mm:ss.</p>
+      <div class="dialog-actions">
+        <button value="cancel" formnovalidate>Cancel</button>
+        <button value="save">Save</button>
+        <button value="apply" class="primary">Apply to all trays</button>
+      </div>
+    </form>
+  </dialog>
 
   <script type="module" src="/app.js"></script>
 </body>

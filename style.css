@@ -127,6 +127,88 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 
 .hint { text-align: center; color: var(--muted); font-size: 0.85rem; margin: 20px 0 0; }
 
+/* ---------- mode switch ---------- */
+.mode-switch {
+  display: flex;
+  max-width: 1100px;
+  margin: 0 auto 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 4px;
+  gap: 4px;
+}
+.mode-switch button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 10px;
+}
+.mode-switch button[aria-pressed="true"] { background: var(--accent); color: #082f49; }
+
+button.icon { font-size: 1.15rem; padding: 10px 13px; line-height: 1; }
+
+/* ---------- order cards ---------- */
+.part {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "label at" "count count" "bar bar";
+  align-items: baseline;
+  gap: 2px 8px;
+  text-align: left;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  min-width: 0;
+}
+.part .label { grid-area: label; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.part .at { grid-area: at; justify-self: end; font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+.part .count { grid-area: count; text-align: center; font-size: clamp(1.9rem, 7vw, 2.4rem); font-weight: 700; font-variant-numeric: tabular-nums; }
+.part .bar { grid-area: bar; margin-top: 4px; }
+.part[data-part="pickup"] .label { color: #c4b5fd; }
+.part[data-part="pickup"] .bar span { background: #a78bfa; }
+.part.running { border-color: var(--run); }
+.part.running .bar span { background: var(--run); }
+.part.done { border-color: var(--done); }
+.part.done .at { color: var(--done); font-weight: 700; }
+.part.done .bar span { background: var(--done); }
+
+/* ---------- dialogs ---------- */
+dialog {
+  width: min(420px, calc(100vw - 32px));
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px;
+}
+dialog::backdrop { background: rgb(2 6 23 / 0.7); }
+dialog h2 { margin: 0 0 12px; font-size: 1.15rem; }
+dialog form { display: flex; flex-direction: column; gap: 12px; }
+.muted { color: var(--muted); margin: 0; font-size: 0.9rem; }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 0.9rem; color: var(--muted); }
+.field[hidden] { display: none; }
+.field input {
+  font: inherit;
+  font-size: 1.3rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color-scheme: dark;
+}
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.seg label {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px; cursor: pointer;
+}
+.seg label:has(input:checked) { border-color: var(--accent); color: var(--accent); }
+.error { color: var(--done); margin: 0; font-size: 0.9rem; }
+.dialog-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 4px; }
+
 @media (prefers-reduced-motion: reduce) {
   .tray.done { animation: none; background: #431407; }
 }
@@ -139,4 +221,7 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
   .time { font-size: clamp(1.9rem, 10vw, 2.4rem); }
   .controls { gap: 6px; }
   .controls button { padding: 12px 4px; font-size: 0.95rem; }
+  .part { padding: 8px; grid-template-areas: "label label" "count count" "at at" "bar bar"; }
+  .part .at { justify-self: center; }
+  .part .count { font-size: clamp(1.5rem, 8vw, 2rem); }
 }
